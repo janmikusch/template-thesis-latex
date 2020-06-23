@@ -7,46 +7,6 @@ The following sub chapters are describing the game idea, how the game-play part 
 
 
 
-------------------------
-
-The aim of this thesis is to find out, how the communication between players affects the gameplay
-of cooperative multiplayer puzzle-games, as well which communication channels players rely
-on. 
-A self-made game will be created using the Unity Game Engine.
-
-
-Game-Idee komplett:
-Spiel wird auf 2 Bildschirme gerendert, für jeden Spieler ein Bildschirm.
-Spieler ROT kann nur mit roten objekten interagieren, Spieler BLAU nur mit blauen.
-Spieler ROT sieht blaue Objekte, aber keine roten \& vice versa
-
-Interkative Objekte: 
-Einfache Schalter, gleichzeitig zu bedienende Schalter, Druckplatten, verschiebbare Wände, 
-Bodenfallen, die nicht betreten werden dürfen
-
-
-Joey: Auf Direkte Verbale Kommunikation verzichten, damit womöglich die Verwendung der Game-Machanics verstärkt wird. Puzzle-Mäßiges zusammen-bauen -> Stromleitung zusammen bauen
-
-Eis-Rutsch Bodenplatten für schwierigere Schieberätsel?
-
-
-
-
-
-
-Game mechanics and communication methods like pings, annotations and character-gestures
-will be implemented. 
-
-During a study, participants will be asked to play for a certain of time.
-For communication the participants can rely on voice, as well as the build-in methods within
-the game, including pings and annotations, as well as gestures their character is able to perform.
-The participant will be separated with a wall between them, so they cannot see each other or
-the display of their partner.
-
-
-
-
-
 \subsection{Game idea}
 \label{section:Game idea}
 As the purpose of this game is the testing of communication tools, which are implemented within the game, a simple game has to be made.
@@ -132,7 +92,7 @@ Besides a simple location-ping, a player can also use six semantically imbued pi
 \begin{figure}
     \centering
     \includegraphics[width=0.5\textwidth]{images/emoji_selection.png}
-    \caption{Selection interface of all emojis. Above player red, a thumbs-up emoji is displayed}
+    \caption{Selection interface of all emojis. Above player red, a thumbs-up emoji is displayed.}
     \label{fig:emoji selection}
 \end{figure}
 
@@ -144,7 +104,7 @@ Besides all eight select-able emojis, an exclamation mark emoji is shown above t
 \begin{figure}
     \centering
     \includegraphics[width=0.5\textwidth]{images/decal_selection.png}
-    \caption{Selection interface of all emojis. Above player red, a thumbs-up emoji is displayed}
+    \caption{Selection interface of all decals.}
     \label{fig:decal selection}
 \end{figure}
 
@@ -158,48 +118,195 @@ The fourth communication game mechanic is the recording of the current player po
 \subsection{Gameplay implementations}
 \label{section:Gameplay implementations}
 
-character
-    active player
-    move
-    interact
-    Position Syncronisation
-    Animation Syncronisation
-    
-camera
 
-overlapping collider
+\subsubsection{Player Character}
 
-move object
+Both, the red player and the blue player, have the same scripts and components applied. They only differ by attributes like the player id, the layer to look for interact-able objects, as well as their player colour.
+The player input is handles via the \textit{Unity Input System\footnote{\url{https://docs.unity3d.com/Packages/com.unity.inputsystem@1.0/manual/index.html} - accessed on 14th June 2020}}. For simplicity, both player character are listening to the player input, but only the character which is controlled by the local player executes the method completly.
+Each player character has a \textit{Player}-Script attached with an public method named \textit{CanUsePlayerObject()}, which returns whether the player character is controlled by the local player.
 
-pressure plate
+When a player joins the game, the Lobby scene gets loaded by the \textit{NetworkGameManager}. The NetworkGameManager Updates the current player map, which maps all player ids (representing the player colour) to the actor number provided by Photon. The first player is always mapped onto the red player, the second player is controlling the blue player.
+The local player actor number, retrieved via \texttt{PhotonNetwork.LocalPlayer.ActorNumber}, can then be checked against the actor number behind a player id.
 
-toggle
+Per default, only the host, which here is the red player as the first player, is able to controll objects. To move objects or the player around, the ownership of the object has to be transferred to the local player, which want to modify it.
+When a level is loaded, the ownership of the player characters are set to the actor number, which is mapped to the corresponding player id.
 
-traps
+The character is then moved by the \textit{PlayerMove} script.
+The input direction is saved to a corresponding variable, which is updated with an event-call, triggered by an input change. When the player is not trying to move a box, the build-in character-controller is instructed to move the player towards the wanted direction, as long there is no collision detected.
+The player is also rotating towards the movement input direction.
+
+By pressing space, the \textit{PlayerInteract}-Script checks for interact-able objects infront of the player by using a raycast. If the interact-able object is also move-able, which means it is a move-able box, a reference is saved.
+When there is a reference, the PlayerMove script does not only instruct the character controller to move the character. First, it is checked if the object can be moved in the given direction. When the object returns a positive call, the move-able object and the character is moved.
+When the object in front is a toggle, the \textit{Interact()}-method of the toggle is called.
+The \textit{PhotonView}-Component attached to the player character synchronises the player position, rotation and the current animation state among all players.
 
 
+\subsubsection{Camera}
+
+The camera itself is handled by unity's \textit{Cinemachine\footnote{\url{https://docs.unity3d.com/Manual/com.unity.cinemachine.html} - accessed on 14th June 2020}}-Framework.
+Each scene has a virtual camera, controlled by a CinemachineVirtualCamera-Script. The local controllable player is set to the follow target of the script.
+Thus the virtual camera transposes the camera to a fixed offset.
+
+\subsubsection{Overlapping Collider}
+
+Overlapping colliders are used pressure plates and move-able boxes.
+When the OnTriggerEnter-Callback is called by unity's physic engine, it is checked if triggers should be ignored, if the given collider should be ignored and if the overlapping object has an accepted trigger.
+When the object is valid, it is added to the currently overlapping collider list. The \textit{IsOverlapping}-Method will return true, if there is a overlapping collider, except for one state. If the parameter is also given the player collider and only the player collider is added to the overlapping collider list, the method is still returning false. This was implemented because a character was not able to pull a box object when the character was in range, while moving the object.
+
+\subsubsection{Moveable Box}
+
+Each moveable Box has a OverlappingTrigger on each side attached, as well as a MoveableObject-Script. The IsMoveable-Method is called by the playerMove script, when there is a reference saved of the current objected which is moved by the player, as described in before. It will return true if the overlapping collider at the required direction is returning no future collision with other objects.
+When a Box is already moved by another player, the box will not be interact-able until the other player stops the interaction.
+
+\subsubsection{Pressure plate}
+
+Pressure plates are using a overlapping collider, which checks if there is an object above the pressure plate.
+When the enable state changes, a remote procedure call(RPC) is used to sync the pressure plate among all players.
+To be able to use RPCs, a gameobject needs to have a PhotonView-Component.
+
+As each PhotonView-Component has an id, the RPC can be send and the correct method on the object with the same id on the other machine is called.
+When the id of an PhotonView-Component has a duplicate without the required method, an error will be thrown.
+This can occur when the scene is changed and the new scene is having network-objects with the same id, but different scripts attached. To bypass this circumstance, Photon has the option to set the minimum id for a scene. Id's below the minimum will be updated to the next free id, which is available in the current scene.
+
+When the state is changed by an incoming RPC-Call, Unity-Events for enabling and disabling pressure plate are invoked. As a result, the UnityEvent can be used in the inspector, to enable or disable objects or call public methods.
+
+\subsubsection{Toggle}
+
+Toggles are working similar to pressure-plates but have a simple \textit{Interactable}-method, called by the PlayerInteract-Script when the player stands before a toggle. The state is always inverted and will be sent via an RPC, to syncronise all toggles.
 
 
+\subsubsection{Sync-Toggle}
 
+Sync-Toggles can only be indirectly used by the player.
+Sync-Toggles are having elements, which can be enabled and disabled by pressure-plates or toggles. Sync-Toggles are activated when all elements are enabled. The goal-platform is a special sync-toggle which loads the next level when both players are standing on their corresponding goal-pressure plate.
+When an element is enabled or disabled, a RPC is called.
+The UnityEvents are only invoked when the state has changed, to prevent a RPC-loop between sync-toggles and other toggles, which are connected to each other.
 
+Sync-Toggles can be time-critical. When not all elements are activated at the same time (with an maximum time-offset of 0.2 seconds), the elements are disabled again, which results in toggles which are turning themselves off again.
+
+\subsubsection{Traps}
+
+Traps are separated into one TrapCollection-object, which contains one or multiple Trap-objects.
+When the trap-collection is enabled, a coroutine enables and disables all child-traps. When a player collides with the trigger of a trap, the trap will add the player to the respawn-list of the \textit{PlayerSpawnController}. This only occurs to the local player to prevent respawning because of asynchronous traps between games and network delay.
 
 
 \subsection{Implemented cooperative game mechanics}
 \label{section:Implemented cooperative game mechanics}
 
-Mechanics: 
-\begin{itemize}
-\item Record Ghost, 
-\item Speechbubble with emotes/directions etc.
-\begin{itemize}
-\item kinda like message macros
-\end{itemize}
-\item location & augmented Environment Pings
-\begin{itemize}
-\item Portal 2 countdown-ping
-\item special icon ping
-\end{itemize}
-\item Draw on screen with virtual cursor
-\end{itemize}
+\subsubsection{UI Selection Canvas}
 
-Wie diese Implementiert wurden
+To give the player multiple options for pings, emojis and decals, an selection user interface was necessary. The UI is not directly bound to the game mechanics. Instead the ping, emoji and decal mechanic are all using their own instance of an UI selection.
+Each game mechanic can enable their corresponding UI selection canvas.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/angle_calculation.png}
+    \caption{The screen angle is calculated around the center of the screen, marked by the red dot. The red arrow symbolizes the current mouse position. With this two coordinates, the screen angle is calculated using an arctangent function.}
+    \label{fig:angle calculation}
+\end{figure}
+
+Every Canvas has a GameObject with a \textit{SelectionUI}-Component. The corresponding game mechanic implementation is updating the current angle, which is used to enable the background of the selected object. The angle can be seen in Figure \ref{fig:angle calculation}. A two dimensional vector, starting from the center of the screen to the current mouse position, is used to calculate the current screen angle in degrees.
+
+\begin{verbatim}
+    var direction = currentMousePos - screenCenter;
+    var angle = Mathf.Atan2(direction.y, direction.x);
+    angle *= Mathf.Rad2Deg;
+    angle += 180;
+\end{verbatim}
+
+To a range between two angles, a background GameObject is assigned. The GameObject will be enabled when the angle is set to a value within the range, corresponding to the GameObject.
+
+
+
+\subsubsection{Ping implementation}
+
+To place a ping a raycast from the camera towards the clicked object is created, by using a ray from the camera and its looking direction by using the \textit{ScreenPointToRay()}-Method on the camera-component. When the left mouse button is pressed down, the current mouse position is saved. Using this position as a parameter for \textit{ScreenPointToRay()}, a hitpoint is calculated. This hit point is used as the position for the ping placement.
+
+When the left mouse button is raised again within 0.2 seconds, the standard ping is placed. After this period, the selection UI is enabled and by using the calculated screen angle, which is also parsed to the selection UI, a special ping is placed. This placement is done by an RPC, which has a 3D vector for the position, as well as the angle value as parameters.
+
+Default and special pings are both particle systems with an \textit{PingElement}-Script.
+When the placement RPC for a ping is recived, the ping object chosen with the angle if it is a special ping. Else the next standard ping from a circular buffer is taken. To place the ping object, the \textit{PingElement}-Script has an PingAt(position) Method, which places the object and starts to play the particle effects.
+
+\subsubsection{Emoji implementation}
+
+Emojis are created with the right mouse button. Like the ping-tool, the emoji-tool also has a standard-emoji for a short press, which is an exclamation mark.
+When the right mouse button is pressed over 0.2 seconds, the emoji selection UI is enabled, and the player can choose from 8 different emojis by using their mouse position.
+
+The gameobjects with particle system for each emoji are children of the player object.
+each player object hast an \textit{PlayerEmote}-Script, which gets called by the emote-tool on reciving a RPC. As parameter the angle and the player id is send along, so the emoji is played above the right player.
+
+\subsubsection{Decal implementation}
+
+The decal system selection UI is enabled as soon as the \textbf{F}-key is pressed down. The screen angle is used to choose from the available decals. When the RPC is send, the current player position is send along for the placement of the decal.
+
+On receiving the RPC, the decal corresponding to the angle parameter is placed on the position plus an offset on the y coordinate. With this offset, it is possible to overlap decals without removing the old one.
+
+\subsubsection{Ghost implementation}
+
+While the middle mouse button or Ctrl-Key is pressed, the position of the character is saved in an array of positions with an time-step of 0.1 seconds. The limit for the recording is set to 100 recording steps, which are equal to around 10 seconds.
+When the record-key is released, the player id and the array of positions is send using an RPC.
+
+On receiving the call, a ghost is selected using the player id and is given all position steps. The ghost will then circle through the positions with an coroutine. When the first position is selected, it gets placed onto it, else the next target position is saved. 
+
+Using the next target position, the ghost will move towards it direction with the same movement speed of the player. To create the illusion of a hovering ghost, the coloured sphere's y-coordinate is also changed using a sine wave. This will move the sphere mesh up and down within a range from -0.2 to 0.2 units. One sine wave has a duration of 5 seconds.
+
+
+
+\newpage
+\subsection{Implemented level layouts}
+\label{section:level layouts}
+
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/level_1.png}
+        \caption{Level 1}
+        \label{fig:level 1}
+      \end{subfigure}
+    \begin{subfigure}[b]{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/level_3.png}
+        \caption{Level 3}
+        \label{fig:level 3}
+      \end{subfigure}
+    \begin{subfigure}[b]{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/level_2.png}
+        \caption{Level 2}
+        \label{fig:level 2}
+      \end{subfigure}
+    \begin{subfigure}[b]{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/level_4.png}
+        \caption{Level 4}
+        \label{fig:level 4}
+      \end{subfigure}
+    \begin{subfigure}[b]{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/level_5.png}
+        \caption{Level 5}
+        \label{fig:level 5}
+      \end{subfigure}
+\end{figure}
+
+
+\newpage
+\begin{figure}[h!]
+    \centering    
+    \begin{subfigure}[b]{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/level_6.png}
+        \caption{Level 6}
+        \label{fig:level 6}
+      \end{subfigure}
+    \begin{subfigure}[b]{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/level_8.png}
+        \caption{Level 8}
+        \label{fig:level 8}
+      \end{subfigure}
+    \begin{subfigure}[b]{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/level_7.png}
+        \caption{Level 7}
+        \label{fig:level 7}
+      \end{subfigure}
+    \begin{subfigure}[b]{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/level_9.png}
+        \caption{Level 9}
+        \label{fig:level 9}
+      \end{subfigure}
+\end{figure}
