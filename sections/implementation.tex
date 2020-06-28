@@ -1,15 +1,15 @@
 The aim of this thesis is to find out, how players interact with each other, while they cannot rely on direct verbal communication channels.
-For this reason, a prototype of a cooperative multiplayer game was created.
+For this reason, a prototype of a cooperative multiplayer game is created.
 For the implementation of the game, the game engine Unity\footnote{\url{https://unity.com/}}
-was used. 
-For the network part, the network engine Photon\footnote{\url{https://www.photonengine.com/}} was used. Photon provides an SDK called Photon PUN, which is an integration for the Unity engine.
-The following sub chapters describes the game idea, how the game-play part was implemented, as well as which and how the communication tools were implemented.
+is used. 
+For the network part, the network engine Photon\footnote{\url{https://www.photonengine.com/}} is used. Photon provides an SDK called Photon PUN, which is an integration for the Unity engine.
+The following sub chapters describes the game idea, how the gameplay part is implemented, as well as which and how the communication tools are implemented.
 
 
 
 \subsection{Game idea}
 \label{section:Game idea}
-As the purpose of this game is the testing of communication tools, which are implemented within the game, a simple game had to be made.
+As the purpose of this game is the testing of communication tools, which are implemented within the game, a simple game is created.
 For good cooperation, it was decided to create a cooperative multiplayer game with puzzle elements. The puzzle elements have the purpose to create cooperative puzzles, which can only be solved when players work together. There are nine levels in total the players can complete. Each level has three candies which the players need to collect. All nine levels need to be completed as fast as possible.
 
 \subsubsection{Game elements}
@@ -18,7 +18,7 @@ For good cooperation, it was decided to create a cooperative multiplayer game wi
 \begin{figure}
     \centering
     \includegraphics[scale=0.4]{images/lobby_game_elements.png}
-    \caption{On this image all game elements for each level can be seen:
+    \caption{Overview of all game elements:
     a) goal points for each player b) start points and players c) movable boxes d) pressure plates e) switches f) traps g) candy h) barrier}
     \label{fig:game elements}
 \end{figure}
@@ -36,10 +36,10 @@ Each level consists of a floor and walls. There are always two spawn-points, one
     The movable box blocks the way of the player. This box can be pulled towards the player or pushed in the forward direction of the player. It is not possible to move it sidewards, so the movements are limited to two directions, according to the player's position.
     \item Barrier
     
-    The barrier blocks the players path like a box. The player themself is however not able to interact with it directly. A barrier can be disabled by other elements such as switches or pressure plates
+    The barrier blocks the player's path like a box. The player themself is however not able to interact with it directly. A barrier can be disabled by other elements such as switches or pressure plates
     \item Switch
     
-    A switch has the purpose of enabling or disabling objects. a switch can disable a barrier, so players can pass it.
+    A switch has the purpose of enabling or disabling objects. A switch can disable a barrier, so players can pass it.
     It is also possible to enable and disable traps with it.
     
     Some switches are connected together. Both switches will only stay active, when they are activated at the same time.
@@ -50,7 +50,7 @@ Each level consists of a floor and walls. There are always two spawn-points, one
     There are also pressure plates that are connected with each other. Only while all connected pressure plates are active at the same time, a barrier, for example, is deactivated.
     \item Trap
     
-    Each trap sends the player back to the start, as soon as the player is standing on top of an active trap. An enabled trap has spikes, which disappear for a limited time. When the trap is disabled or the spikes are not visible, the player is able to move over the trap.
+    An active trap pulses between states of extended and retracted spikes. When the trap has retracted spikes, the player is able to move on top of it freely. When the player is on top of the spikes while they are extended, the player is sent back to the start.
 \end{enumerate}
 
 The graphics for all listed elements can be seen in Figure \ref{fig:game elements}.
@@ -80,25 +80,25 @@ To give the players the possibility to interact with each other, there are the f
         \caption{All six ping types}
         \label{fig:ping types}
     \end{subfigure}
-    \caption{ a) shows a placed location ping. 
-    b) shows the selection user interface of all 6 advanced ping types players can use. By choosing the stopwatch-icon, a countdown at the selected position is placed. All other five options place icons for a temporary time onto the environment.}
+    \caption{
+    Different ping indicators.}
 \end{figure}
 
 In the game, three types of pings are available. As mentioned in
 Section \ref{section:Attention-focusing}, pings are counted towards attention-focusing game mechanics. With a simple left click of the mouse, a location-ping is created at the clicked position. On figure \ref{fig:location ping} a location ping can be seen.
-Besides a simple location-ping, a player can also use six semantically imbued pings. Figure \ref{fig:ping types} shows all six typed a player is able to choose. For time critical actions such as a time based switch, a countdown ping can be placed. The other 5 options should give the player the possibility to give commands to other players. 
+In addition to a simple location-ping, a player can also use six semantically imbued pings. Figure \ref{fig:ping types} shows all six typed a player is able to choose. For time critical actions such as a time based switch, a countdown ping can be placed. The other five options should give the player the possibility to give commands to other players. 
 
 
 \begin{figure}
     \centering
     \includegraphics[width=0.5\textwidth]{images/emoji_selection.png}
-    \caption{Selection interface of all emojis. Above player red, a thumbs-up emoji is displayed.}
+    \caption{Selection interface of all emojis. A thumbs-up emoji is played above the red player.}
     \label{fig:emoji selection}
 \end{figure}
 
 For immersive communication, players get the option to use emojis.
 Figure \ref{fig:emoji selection} shows all selectable emojis. The selection window opens while the right mouse button is pressed. The currently selected emoji is chosen when the right mouse button is released by the player.
-Besides all eight selectable emojis, an exclamation mark emoji is shown above the players head. The intention behind the emojis is to give the player a way to express their feelings. Players should have the possibility to describe their current emotional state without choosing wording. This communication mechanic is a expressive emotional game mechanic as described in \ref{section:Expressive}.
+In addition to all eight selectable emojis, an exclamation mark emoji can be shown above the players head. The intention behind the emojis is to give the player a way to express their feelings. Players should have the possibility to describe their current emotional state without choosing wording. This communication mechanic is a expressive emotional game mechanic as described in \ref{section:Expressive}.
 
 
 \begin{figure}
@@ -108,7 +108,7 @@ Besides all eight selectable emojis, an exclamation mark emoji is shown above th
     \label{fig:decal selection}
 \end{figure}
 
-To create longer lasting messages, players can create decals with 8 different images, seen in \ref{fig:decal selection}. This decal-system is an environment-modifying communication mechanic, described in \ref{section:Environment-modifying}. This images are placed onto the ground below the player. Every decal overlaps the last one, but is not deleted. They last as long as the current level is player. With arrow marks on the floor as an example, players could mark a safe path which can be run along.
+To create longer lasting messages, players can create decals with eight different images, seen in \ref{fig:decal selection}. This decal-system is an environment-modifying communication mechanic, described in \ref{section:Environment-modifying}. These images are placed onto the ground below the player. Every decal overlaps the last one, but is not deleted. They last as long as the current level is played. With arrow marks on the floor as an example, players could mark a safe path which can be run along.
 
 
 The fourth communication game mechanic is the recording of the current player position. While pressing the Ctrl-key or the middle mouse button, the current location of the player is saved. On release, a light transparent sphere with the player-colour is following the recorded path. This tool is not necessarily a way to communicate with each other. It was implemented to test, if players would use the ghost for emergent cooperative communication as described in section \ref{section:Emergent}. Theoretically, it could also be used to "draw" signs by walking onto the environment. The main purpose however, is to give the user the possibility to record a safe path they were able to run along.
@@ -132,55 +132,58 @@ Per default, only the host, which here is the red player as the first player, is
 When a level is loaded, the ownership of the player characters are set to the actor number, which is mapped to the corresponding player id.
 
 The character is then moved by the \textit{PlayerMove} script.
-The input direction is saved to a corresponding variable, which is updated with an event-call, triggered by an input change. When the player is not trying to move a box, the build-in character-controller is instructed to move the player towards the wanted direction, as long there is no collision detected.
+The input direction is saved to a corresponding variable, which is updated with an event-call, triggered by an input change. When the player is not trying to move a box, the built-in character-controller is instructed to move the player towards the wanted direction, as long there is no collision detected.
 The player is also rotating towards the movement input direction.
 
 By pressing space, the \textit{PlayerInteract}-Script checks for interactable objects in front of the player by using a raycast. If the interactable object is also moveable, which means it is a moveable box, a reference is saved.
-When there is a reference, the \textit{PlayerMove} script does not only instruct the character controller to move the character. First, it is checked if the object can be moved in the given direction. When the object returns a positive call, the moveable object and the character is moved.
-When the object in front is a toggle, the \textit{Interact()}-method of the toggle is called.
+While the \textit{PlayerMove}-Script has a reference of a \textit{MoveableObject}, it additionally moves the corresponding object. First, it is checked if the object can be moved in the given direction. When the object returns a positive call, the moveable object and the character is moved.
+
+When the player presses the interaction-key, while a toggle is in front of the player, the \textit{Interact()}-method of the toggle is called.
+
 The \textit{PhotonView}-Component attached to the player character synchronises the player position, rotation and the current animation state among all players.
 
 
 \subsubsection{Camera}
 
-The camera itself is handled by unity's \textit{Cinemachine\footnote{\url{https://docs.unity3d.com/Manual/com.unity.cinemachine.html} - accessed on 14th June 2020}}-Framework.
+The camera itself is handled by Unity's \textit{Cinemachine\footnote{\url{https://docs.unity3d.com/Manual/com.unity.cinemachine.html} - accessed on 14th June 2020}}-Framework.
 Each scene has a virtual camera, controlled by a \textit{CinemachineVirtualCamera}-script. The local controllable player is set as the follow-target of the \textit{CinemachineVirtualCamera}-script.
 Thus the virtual camera transposes the camera to a fixed offset.
 
 \subsubsection{Overlapping Collider}
 
-Overlapping colliders use pressure plates and moveable boxes.
-When the OnTriggerEnter-Callback is called by unity's physic engine, it is checked if triggers should be ignored, if the given collider should be ignored and if the overlapping object has an accepted trigger.
-When the object is valid, it is added to the currently overlapping collider list. The \textit{IsOverlapping}-Method will return true, if there is a overlapping collider, except for one state. If the parameter is also given the player collider, and the player collider is the only collider added to the overlapping collider list, the method is returns false. This was implemented because a character was not able to pull a box object when the character was in range, while moving the object.
+Overlapping colliders are used by pressure plates and moveable boxes.
+When the OnTriggerEnter-Callback is called by Unity's physic engine, it is checked if triggers should be ignored, if the given collider should be ignored and if the overlapping object has an accepted trigger.
+When the object is valid, it is added to the currently overlapping collider list. The \textit{IsOverlapping}-Method will return true, if there is a overlapping collider.
+One exception exists: If the parameter is also given the player collider, and the player collider is the only collider added to the overlapping collider list, the method is returns false. This was implemented because a character was not able to pull a box object when the character was in range, while moving the object.
 
 \subsubsection{Moveable Box}
 
-Each moveable Box has an OverlappingTrigger attached on each side , as well as a MoveableObject-Script. The IsMoveable-Method is called by the \textit{PlayerMove}-Script, when there is a reference saved of the current objected which is moved by the player, as described in before. It will return true if the overlapping collider at the required direction is returning no future collision with other objects.
+Each moveable box has an \textit{OverlappingCollider} attached to each side , as well as a MoveableObject-Script. The \textit{IsMoveable}-Method is called by the \textit{PlayerMove}-Script, when it is set as the referenced \textit{MoveableObject}, as described before. It will return true if the overlapping collider at the required direction is returning no future collision with other objects.
 When a Box is already moved by another player, the box will not be interactable until the other player stops the interaction.
 
-\subsubsection{Pressure plate}
+\subsubsection{Pressure Plate}
 
-Pressure plates are using a overlapping collider, which checks if there is an object above the pressure plate.
-When the enable state changes, a remote procedure call(RPC) is used to sync the pressure plate among all players.
-To be able to use RPCs, a gameobject needs to have a PhotonView-Component.
+Pressure plates are using an overlapping collider, which checks if there is an object above the pressure plate.
+When the enabled state changes, a remote procedure call(RPC) is used to sync the pressure plate among all players.
+To be able to use RPCs, a GameObject needs to have a PhotonView-Component.
 
 As each PhotonView-Component has an id, the RPC can be sent and the correct method on the object with the same id on the other machine is called.
-When the id of a \textit{PhotonView}-Component has a duplicate without the required method, an error will be thrown.
-This can occur when the scene has changed and the new scene has network-objects with the same id, but different scripts attached. To bypass this circumstance, Photon has the option to set the minimum id for a scene. Id's below the minimum will be updated to the next free id, that is available in the current scene.
+When the id of a \textit{PhotonView}-Component has a duplicate without the required method, an error is thrown.
+This can occur when the scene has changed and the new scene has network-objects with the same id, but different scripts attached. To bypass this circumstance, Photon has the option to set the minimum id for a scene. Id's below the minimum are updated to the next free id, that is available in the current scene.
 
-When the state was changed by an incoming RPC-Call, Unity-Events for enabling and disabling pressure plates are invoked. As a result, the UnityEvent can be used in the inspector, to enable or disable objects or call public methods.
+When the state is changed by an incoming RPC-Call, \textit{UnityEvent}s for enabling and disabling pressure plates are invoked. As a result, the \textit{UnityEvent} can be used in the inspector, to enable or disable objects or call public methods.
 
 \subsubsection{Toggle}
 
-Toggles work similar to pressure-plates but have a simple \textit{Interactable}-method, called by the PlayerInteract-Script when the player stands before a toggle. The state is always inverted and will be sent via an RPC, to syncronise all toggles.
+Toggles work similar to pressure-plates but have a simple \textit{Interactable}-method, called by the PlayerInteract-Script when the player stands in front of a toggle. The state is always flipped and sent via an RPC, to synchronise all toggles.
 
 
 \subsubsection{Sync-Toggle}
 
-Sync-Toggles can only be indirectly used by the player.
+Sync-Toggles can only be indirectly manipulated by the player.
 Sync-Toggles have elements, which can be enabled and disabled by pressure-plates or toggles. Sync-Toggles are activated when all elements are enabled. The goal-platform is a special sync-toggle which loads the next level when both players are standing on their corresponding goal-pressure plate.
-When an element is enabled or disabled, a RPC is called.
-The UnityEvents are only invoked when the state has changed, to prevent a RPC-loop between sync-toggles and other toggles, which are connected to each other.
+When an element is enabled or disabled, an RPC is called.
+The UnityEvents are only invoked when the state has changed, to prevent an RPC-loop between sync-toggles and other toggles, which are connected to each other.
 
 Sync-Toggles can be time-critical. When not all elements are activated at the same time (with a maximum time-offset of 0.2 seconds), the elements are disabled again, which results in toggles which turn themselves off again.
 
@@ -195,7 +198,7 @@ When the trap-collection is enabled, a coroutine enables and disables all child-
 
 \subsubsection{UI Selection Canvas}
 
-To give the player multiple options for pings, emojis and decals, a selection user interface was necessary. The UI is not directly bound to the game mechanics. Instead the ping, emoji and decal mechanics all use their own instance of an UI selection.
+To give the player multiple options for pings, emojis and decals, a selection user interface is necessary. The UI is not directly bound to the game mechanics. Instead the ping, emoji and decal mechanics all use their own instance of an UI selection.
 Each game mechanic can enable its corresponding UI selection canvas.
 
 \begin{figure}
@@ -207,14 +210,25 @@ Each game mechanic can enable its corresponding UI selection canvas.
 
 Every Canvas has a GameObject with a \textit{SelectionUI}-Component. The corresponding game mechanic implementation updates the current angle, which is used to enable the background of the selected object. The angle can be seen in Figure \ref{fig:angle calculation}. A two dimensional vector, starting from the centre of the screen to the current mouse position, is used to calculate the current screen angle in degrees.
 
-\begin{verbatim}
-    var direction = currentMousePos - screenCenter;
-    var angle = Mathf.Atan2(direction.y, direction.x);
-    angle *= Mathf.Rad2Deg;
-    angle += 180;
-\end{verbatim}
+\begin{lstlisting}[
+	label=listing:Main, %for reference to this listing
+	float=h,
+	caption=GetScreenAngle() calculation,
+	firstnumber=10
+]
+    private float GetScreenAngle()
+    {
+        var screenMiddle = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
+        var direction = this.currentMousePos - screenMiddle;
+        var angle = Mathf.Atan2(direction.y, direction.x);
+        angle *= Mathf.Rad2Deg;
+        angle += 180;
 
-a background-GameObject is assignedTo a range between two angles. The GameObject will be enabled when the angle is set to a value within the range, corresponding to the GameObject.
+        return angle;
+    }
+\end{lstlisting}
+
+A background-GameObject is assigned to a range between two angles. The GameObject is enabled when the angle is set to a value within the range, corresponding to the GameObject.
 
 
 
@@ -233,7 +247,7 @@ Emojis are created with the right mouse button. Like the ping-tool, the emoji-to
 When the right mouse button is pressed over 0.2 seconds, the emoji selection UI is enabled, and the player can choose from 8 different emojis by using their mouse position.
 
 The GameObjects with a particle system for each emoji are children of the player object.
-Each player object has a \textit{PlayerEmote}-Script, which gets called by the emote-tool on receiving a RPC. As the angle and the player id are sent along as parameters, so the emoji starts playing above the right player.
+Each player object has a \textit{PlayerEmote}-Script, which gets called by the emote-tool on receiving an RPC. As the angle and the player id are sent along as parameters, so the emoji starts playing above the right player.
 
 \subsubsection{Decal implementation}
 
@@ -243,7 +257,7 @@ On receiving the RPC, the decal corresponding to the angle parameter is placed o
 
 \subsubsection{Ghost implementation}
 
-While the middle mouse button or Ctrl-Key is pressed, the position of the character is saved in an array of positions with an time-step of 0.1 seconds. The limit for the recording is set to 100 recording steps, which are equal to around 10 seconds.
+While the middle mouse button or Ctrl-Key is pressed, the position of the character is saved in an array of positions with an time-step of 0.1 seconds. The limit for the recording is set to 100 recording steps, which is equal to around 10 seconds.
 When the record-key is released, the player id and the array of positions is sent using an RPC.
 
 On receiving the call, a ghost is selected using the player id and is given all position steps. The ghost will then circle through the positions with an coroutine. When the first position is selected, it is placed onto it, otherwise the next target position is saved. 
