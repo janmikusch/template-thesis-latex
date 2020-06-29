@@ -7,12 +7,12 @@ The following sub chapters describes the game idea, how the gameplay part is imp
 
 
 
-\subsection{Game idea}
+\subsection{Game Idea}
 \label{section:Game idea}
 As the purpose of this game is the testing of communication tools, which are implemented within the game, a simple game is created.
 For good cooperation, it was decided to create a cooperative multiplayer game with puzzle elements. The puzzle elements have the purpose to create cooperative puzzles, which can only be solved when players work together. There are nine levels in total the players can complete. Each level has three candies which the players need to collect. All nine levels need to be completed as fast as possible.
 
-\subsubsection{Game elements}
+\subsubsection{Game Elements}
 \label{section:Game elements}
 
 \begin{figure}
@@ -63,7 +63,7 @@ The same is valid for the red player and red objects
 
 To force the player to collaborate with their partner, a blue object can only be seen by the red player, and a red object can only the seen by the blue player. As both players are not able to see every object they can interact with, they need to tell their partner, where an object is, where a box needs to be moved to and which areas they need to leave untouched.
 
-\subsubsection{Cooperative game mechanics}
+\subsubsection{Cooperative Game Mechanics}
 \label{Cooperative game mechanics}
 
 To give the players the possibility to interact with each other, there are the following mechanics a player can use.
@@ -115,7 +115,7 @@ The fourth communication game mechanic is the recording of the current player po
 
 
 
-\subsection{Gameplay implementations}
+\subsection{Gameplay Implementations}
 \label{section:Gameplay implementations}
 
 
@@ -193,7 +193,7 @@ Traps consist of a parent \textit{TrapCollection}-Object, which contains one or 
 When the trap-collection is enabled, a coroutine enables and disables all child-traps. When a player collides with the trigger of a trap, the trap will add the player to the respawn-list of the \textit{PlayerSpawnController}. This only occurs to the local player to prevent respawning because of asynchronous traps between games and network delay.
 
 
-\subsection{Implemented cooperative game mechanics}
+\subsection{Implemented Cooperative Game Mechanics}
 \label{section:Implemented cooperative game mechanics}
 
 \subsubsection{UI Selection Canvas}
@@ -232,7 +232,7 @@ A background-GameObject is assigned to a range between two angles. The GameObjec
 
 
 
-\subsubsection{Ping implementation}
+\subsubsection{Ping Implementation}
 
 To place a ping, a raycast from the camera towards the clicked object is created, by using a ray from the camera and its looking direction by using the \textit{ScreenPointToRay()}-Method on the camera-component. When the left mouse button is pressed down, the current mouse position is saved. Using this position as a parameter for \textit{ScreenPointToRay()}, a hitpoint is calculated. This hit point is used as the position for the ping placement.
 
@@ -241,7 +241,7 @@ When the left mouse button raises again within 0.2 seconds, the standard ping is
 Default and special pings are both particle systems with an \textit{PingElement}-Script.
 When the placement RPC for a ping is received, the ping object chosen with the angle if it is a special ping. Otherwise the next standard ping from a circular buffer is taken. To place the ping object, the \textit{PingElement}-Script has a \textit{PingAt(position)}-Method, which places the object and starts to play the particle effects.
 
-\subsubsection{Emoji implementation}
+\subsubsection{Emoji Implementation}
 
 Emojis are created with the right mouse button. Like the ping-tool, the emoji-tool also has a standard-emoji for a short press, which is an exclamation mark.
 When the right mouse button is pressed over 0.2 seconds, the emoji selection UI is enabled, and the player can choose from 8 different emojis by using their mouse position.
@@ -249,13 +249,13 @@ When the right mouse button is pressed over 0.2 seconds, the emoji selection UI 
 The GameObjects with a particle system for each emoji are children of the player object.
 Each player object has a \textit{PlayerEmote}-Script, which gets called by the emote-tool on receiving an RPC. As the angle and the player id are sent along as parameters, so the emoji starts playing above the right player.
 
-\subsubsection{Decal implementation}
+\subsubsection{Decal Implementation}
 
 The decal system selection UI is enabled as soon as the \textbf{F}-key is pressed down. The screen angle is used to choose from the available decals. When the RPC is sent, the current player position is sent along for the placement of the decal.
 
 On receiving the RPC, the decal corresponding to the angle parameter is placed on the position plus an offset on the y-coordinate. With this offset, it is possible to overlap decals without removing the old one.
 
-\subsubsection{Ghost implementation}
+\subsubsection{Ghost Implementation}
 
 While the middle mouse button or Ctrl-Key is pressed, the position of the character is saved in an array of positions with an time-step of 0.1 seconds. The limit for the recording is set to 100 recording steps, which is equal to around 10 seconds.
 When the record-key is released, the player id and the array of positions is sent using an RPC.
@@ -267,7 +267,7 @@ Using the next target position, the ghost will move towards its direction with t
 
 
 \newpage
-\subsection{Implemented level layouts}
+\subsection{Implemented Level Layouts}
 \label{section:level layouts}
 
 \begin{figure}[h!]
